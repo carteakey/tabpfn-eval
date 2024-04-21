@@ -1,4 +1,4 @@
-\documentclass[a4paper]{article}
+\documentclass[12pt,a4paper]{article}
 
 %% Language and font encodings
 \usepackage[english]{babel}
@@ -50,7 +50,7 @@
 \usepackage{lipsum}
 \usepackage{subcaption}
 \usepackage{authblk}
-% \usepackage[T1]{fontenc}    % Font encoding
+\usepackage[T1]{fontenc}    % Font encoding
 \usepackage{csquotes}       % Include csquotes
 \usepackage{diagbox}
 
@@ -64,7 +64,12 @@
 \titleformat{\section} % Redefine section numbering format
   {\normalfont\Large\bfseries}{\thesection.}{1em}{}
   
+% Customize line numbering format to right-align line numbers
+\usepackage{lineno} % Add the lineno package
+\renewcommand\linenumberfont{\normalfont\scriptsize\sffamily\color{blue}}
+\rightlinenumbers % Right-align line numbers
 
+\linenumbers % Enable line numbering
 
 % Define a new command for the fourth-level title.
 \newcommand{\subsubsubsection}[1]{%
@@ -102,7 +107,10 @@
 \title{A replication study of transformer-based TabPFN for assessing the applicability of neural-network based solutions in tabular classification.}
 
 \author[1]{Kartikey Chauhan}
-\affil[1]{\small Data Science \& Analytics, Toronto Metropolitan University}
+\affil[1]{\small Department, Organization, Street, City, 100190, State, Country}
+\affil[2]{Department, Organization, Street, City, 10587, State, Country}
+\affil[3]{Department, Organization, Street, City, 610101, State, Country}
+\affil[*]{Corresponding author: \texttt{user\_id@university.edu}}
 
 \date{}  % Remove date
 
