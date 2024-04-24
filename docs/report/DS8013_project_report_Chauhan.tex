@@ -11,7 +11,7 @@
 % Useful packages
 %\usepackage[natbibapa]{apacite} % APA-style citations.
 
-\usepackage[style=apa, backend=biber]{biblatex} % APA 7th edition style citations using biblatex
+\usepackage[style=numeric, backend=biber]{biblatex} % APA 7th edition style citations using biblatex
 \addbibresource{references.bib} % Your .bib file
 
 % Formatting DOI in APA-7 style
@@ -135,7 +135,46 @@ Recently, TabPFN \footnote{\url{https://github.com/automl/TabPFN}} proposes a ra
   \caption{\label{fig:priors} Visualization of Prior samples.}
   \end{figure}
 
+\subsection{TabPFN Architecture}\label{subsec1}
+TabPFN proposed a two-stage approach for tabular data classification: 
+(i) First, meta-learn to approximate Bayesian inference using synthetic datasets. 
+(ii) Second, use the labeled samples *in context* to classify unlabelled samples.
 
+\begin{verbatim}
+  TransformerModel(
+    (transformer_encoder): TransformerEncoderDiffInit(
+      (layers): ModuleList(
+        (0-11): 12 x TransformerEncoderLayer(
+          (self_attn): MultiheadAttention(
+            (out_proj): NonDynamicallyQuantizableLinear(in_features=512, out_features=512, bias=True)
+          )
+          (linear1): Linear(in_features=512, out_features=1024, bias=True)
+          (dropout): Dropout(p=0.0, inplace=False)
+          (linear2): Linear(in_features=1024, out_features=512, bias=True)
+          (norm1): LayerNorm((512,), eps=1e-05, elementwise_affine=True)
+          (norm2): LayerNorm((512,), eps=1e-05, elementwise_affine=True)(dropout1): Dropout(p=0.0, inplace=False)
+          (dropout2): Dropout(p=0.0, inplace=False)
+        )
+      )
+    )
+    (encoder): Linear(in_features=100, out_features=512, bias=True)
+    (y_encoder): Linear(in_features=1, out_features=512, bias=True)
+    (decoder): Sequential(
+      (0): Linear(in_features=512, out_features=1024, bias=True)
+      (1): GELU(approximate='none')
+      (2): Linear(in_features=1024, out_features=10, bias=True)
+    )
+    (criterion): CrossEntropyLoss()
+  )
+  \end{verbatim}
+
+%--- Insert an image comparing 4 classifiers ---%
+\begin{figure}[!ht]
+  \centering
+  \includegraphics[width=0.6\linewidth]{figures/TabPFN_architecture.png}
+  \caption{\label{fig:TabPFN_arch} TabPFN Architecture.}
+  \end{figure}
+  
 \subsection{How to create sections and subsections}
 Simply use the section and subsection commands, as in this example document! With Overleaf, all the formatting and numbering is handled automatically according to the template you've chosen. If you're using the Visual Editor, you can also create new sections and subsections via the buttons in the editor toolbar.
 
@@ -154,7 +193,7 @@ Simply use the section and subsection commands, as in this example document! Wit
 
 \subsection{Baselines}\label{subsec2}
 
-We start with evaluation of the existing model provided the authors of TabPFN. 
+We start with evaluation of the existing model provided the authors of TabPFN.  We compare against five standard ML methods and two state-of-the-art AutoML systems for tabular data.
 
 \subsubsection{Datasets}\label{subsubsec2}
 \lipsum[8]

@@ -39,3 +39,31 @@ Relevant for the used batch size is: batch_size (8), aggregate_k_gradients (8) a
 https://github.com/automl/TabPFN/issues/26
 
 I think, this might be a confusion that: i) we use 8 GPU training and the batch_size parameter is per GPU, ii) our aggregate_k_gradients aggregates seperate batches in our repo logic, which are the same batch in the optimizer logic, which we write about, though.
+
+
+
+No of datasets: 247
+Mean ROC: 0.837
+Mean Cross Entropy: 0.451
+Mean Accuracy: 0.792
+Mean Prediction Time: 0.39s
+
+To identify hyperparameters that can be changed for better performance, it's important to have a clear understanding of the problem you are trying to solve and the specific model you are using. However, here are some hyperparameters in your code that you can consider modifying:
+
+1. `config["epochs"]`: This hyperparameter determines the number of training epochs. Increasing the number of epochs may improve model performance, but be cautious of overfitting.
+
+2. `config["max_num_classes"]`: This hyperparameter defines the maximum number of classes. Adjusting this value based on your dataset can improve model accuracy.
+
+3. `config["sampling"]`: This hyperparameter determines the sampling strategy. Experimenting with different sampling techniques, such as "mixed" or "uniform", may lead to better results.
+
+4. `config["categorical_feature_p"]`: This hyperparameter controls the probability of categorical features. Adjusting this value based on the nature of your data can improve model performance.
+
+5. `config["emsize"]`: This hyperparameter sets the embedding size. Increasing the embedding size may capture more complex patterns in the data, but it may also increase model complexity.
+
+6. `config["bptt"]`: This hyperparameter defines the number of time steps for backpropagation through time. Adjusting this value can affect the model's ability to capture long-term dependencies.
+
+7. `config["batch_size"]`: This hyperparameter determines the number of samples processed in each training iteration. Increasing the batch size can speed up training, but it may also require more memory.
+
+8. `config["epochs"]`: This hyperparameter sets the total number of training epochs. Adjusting this value can affect the convergence of the model.
+
+Please note that the impact of these hyperparameters may vary depending on your specific problem and dataset. It's recommended to experiment with different values and evaluate the model's performance to find the optimal configuration.
