@@ -41,7 +41,12 @@ https://github.com/automl/TabPFN/issues/26
 I think, this might be a confusion that: i) we use 8 GPU training and the batch_size parameter is per GPU, ii) our aggregate_k_gradients aggregates seperate batches in our repo logic, which are the same batch in the optimizer logic, which we write about, though.
 
 
-
+No of datasets: 247
+Mean ROC: 0.843
+Mean Cross Entropy: nan
+Mean Accuracy: 0.802
+Mean Prediction Time: 0.357s
+ 
 No of datasets: 247
 Mean ROC: 0.837
 Mean Cross Entropy: 0.451
