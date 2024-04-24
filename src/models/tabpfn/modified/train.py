@@ -33,7 +33,7 @@ def train_function(config_sample, i, add_name=""):
         config_sample,
         device,
         should_train=True,
-        verbose=0,
+        verbose=1,
         epoch_callback=save_callback,
     )
 
