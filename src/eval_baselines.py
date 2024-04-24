@@ -1,6 +1,6 @@
 from sklearn.metrics import log_loss, roc_auc_score , accuracy_score
 from sklearn.model_selection import train_test_split
-from utils import get_openml_classification,preprocess_impute
+from src.utils import get_openml_classification,preprocess_impute
 from tabpfn import TabPFNClassifier
 from tqdm import tqdm
 import torch as th
