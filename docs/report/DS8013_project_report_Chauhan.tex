@@ -11,7 +11,7 @@
 % Useful packages
 %\usepackage[natbibapa]{apacite} % APA-style citations.
 
-\usepackage[style=numeric, backend=biber]{biblatex} % APA 7th edition style citations using biblatex
+\usepackage[style=apa, backend=biber]{biblatex} % APA 7th edition style citations using biblatex
 \addbibresource{references.bib} % Your .bib file
 
 % Formatting DOI in APA-7 style
@@ -123,7 +123,7 @@ Abstracts must be able to stand alone and so cannot contain citations to the pap
 
 Deep Learning has revolutionized the field of AI and led to remarkable achievements in applications involving image and text data. In particular, large transformer-based models trained on massive corpora, are disrupting machine learning in many areas. However, when it comes to tabular (a.k.a. structured) data, traditional machine learning methods, such as gradient-boosted decision trees have shown superior performance over deep learning. 
 
-Recently, TabPFN \footnote{\url{https://github.com/automl/TabPFN}} proposes a radical change to how tabular classification is done, introducing a pre-trained Transformer that is able to perform classification without training. This project aims to replicate and do an empirical review of TabPFN's claims, while potentially exploring avenues for further scaling and modifications based on latest advancements in the Transformer space.
+Recently, TabPFN \cite{hollmann2023tabpfn} \footnote{\url{https://github.com/automl/TabPFN}} proposes a radical change to how tabular classification is done, introducing a pre-trained Transformer that is able to perform classification without training. This project aims to replicate and do an empirical review of TabPFN's claims, while potentially exploring avenues for further scaling and modifications based on latest advancements in the Transformer space.
 
 %--- Section ---%
 \section{Background on TabPFN}\label{sec2}
