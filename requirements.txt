@@ -13,3 +13,5 @@ catboost==0.26.1
 hyperopt==0.2.5
 configspace==0.4.21
 # autogluon==0.4.0
+torchviz
+torchview

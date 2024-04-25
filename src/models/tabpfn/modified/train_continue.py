@@ -10,11 +10,6 @@ maximum_runtime = 60 * 1  # in minutes
 
 
 model_state, optimizer_state, config_sample = torch.load(os.path.join("models_diff", "prior_diff_real_checkpointkc_n_0_epoch_16.cpkt"))
-# module_prefix = 'module.'
-# model_state = {k.replace(module_prefix, ''): v for k, v in model_state.items()}
-# for key in list(model_state.keys()):
-#     model_state[key.replace( 'decoder','decoder_dict.standard')] = model_state.pop(key)
-        
         
 def train_function(config_sample,model_state, i, add_name=""):
     start_time = time.time()
@@ -48,7 +43,6 @@ def train_function(config_sample,model_state, i, add_name=""):
     )
 
     return
-
 
 from train_config import config_sample
 train_function(config_sample, model_state,17,  add_name="kc")
