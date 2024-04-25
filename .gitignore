@@ -58,3 +58,4 @@ build/
 
 *.cpkt
 !prior_diff_real_checkpointkc_n_0_epoch_100.cpkt
+.DS_Store

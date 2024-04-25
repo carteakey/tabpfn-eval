@@ -2,7 +2,7 @@
 
 
 Sliding window attention
-
+conda create --name tabpfn python=3.9
 https://github.com/automl/TabPFN/tree/main/tabpfn
 [TabPFNDemo - Colaboratory (google.com)](https://colab.research.google.com/drive/194mCs6SEPEW6C0rcP7xWzcEtt1RBc8jJ)
 [GitHub - automl/tabpfn-client](https://github.com/automl/tabpfn-client)

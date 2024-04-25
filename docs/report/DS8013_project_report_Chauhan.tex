@@ -63,8 +63,6 @@
 \usepackage{titlesec}
 \titleformat{\section} % Redefine section numbering format
   {\normalfont\Large\bfseries}{\thesection.}{1em}{}
-  
-
 
 % Define a new command for the fourth-level title.
 \newcommand{\subsubsubsection}[1]{%
@@ -110,10 +108,11 @@
 \maketitle
 
 \begin{abstract}
-Abstracts must be able to stand alone and so cannot contain citations to the paper’s references, equations, etc. An abstract must consist of a single paragraph and be concise. Because of online formatting, abstracts must appear as plain as possible. Three to six keywords must be included. Each keyword should not exceed three words. %\lipsum[1]
+We perform a replication study of TabPFN, a transformer-based model for tabular data classification. We evaluate the model on a set of benchmark datasets and compare its performance against traditional machine learning methods and state-of-the-art AutoML systems. Our results show that TabPFN outperforms the baselines on most datasets, demonstrating the potential of neural-network based solutions in tabular classification tasks. We also provide an empirical review of TabPFN's claims and discuss potential avenues for further scaling and modifications based on the latest advancements in the Transformer space.
+
 \end{abstract}
 
-\textbf{Keywords}: keyword1, keyword2, keyword3, keyword4, keyword5, keyword6.  
+\textbf{Keywords}: TabPFN, Transformers, Tabular Data, Classification, Machine Learning
 
 %-------------------------------------------
 % Paper Body
@@ -128,7 +127,6 @@ Recently, TabPFN \cite{hollmann2023tabpfn} \footnote{\url{https://github.com/aut
 %--- Section ---%
 \section{Background on TabPFN}\label{sec2}
 
-
 \begin{figure}[!ht]
   \centering
   \includegraphics[width=0.4\linewidth]{figures/priors_visualized.png}
@@ -136,10 +134,31 @@ Recently, TabPFN \cite{hollmann2023tabpfn} \footnote{\url{https://github.com/aut
   \end{figure}
 
 \subsection{TabPFN Architecture}\label{subsec1}
-TabPFN proposed a two-stage approach for tabular data classification: 
-(i) First, meta-learn to approximate Bayesian inference using synthetic datasets. 
-(ii) Second, use the labeled samples *in context* to classify unlabelled samples.
 
+TabPFN proposed a two-stage approach for tabular data classification:
+\begin{itemize}
+  \item First, meta-learn to approximate Bayesian inference using synthetic datasets.
+  \item Second, use the labeled samples \textit{in context} to classify unlabelled samples.
+\end{itemize}
+
+TabPFN is trained on a large number of synthetic datasets generated from a carefully designed prior distribution. This prior incorporates principles from causal reasoning and a preference for simple structures. Here are some key details about the prior used in TabPFN:
+
+\begin{enumerate}
+  \item \textbf{Structural Causal Models (SCMs)}: The prior entails a space of structural causal models, which are used to generate the synthetic datasets. This allows TabPFN to learn the causal relationships and structures present in tabular data.
+  
+  \item \textbf{Preference for Simplicity}: The prior has a preference for simpler causal structures over more complex ones. This bias towards simplicity helps TabPFN avoid overfitting and generalize better to new datasets.
+  
+  \item \textbf{Bayesian Neural Networks (BNNs)}: In addition to SCMs, the prior also includes Bayesian neural networks as a possible data generating mechanism. This allows TabPFN to capture non-linear relationships in the data.
+  
+  \item \textbf{Varying Dataset Characteristics}: The synthetic datasets are generated with varying numbers of features (up to 100), classes (up to 10), and sample sizes (up to 1024). This exposure to diverse dataset characteristics during training helps TabPFN generalize to a wide range of tabular problems.
+  
+  \item \textbf{Hyperparameter Sampling}: The prior also includes sampling of various hyperparameters, such as MLP weight dropout, input feature scaling, and whether to sample the target variable from the last MLP layer or not.
+\end{enumerate}
+
+By training on this carefully designed prior distribution, TabPFN learns to approximate Bayesian inference on tabular data tasks, allowing it to quickly adapt to new datasets through in-context learning without additional training or hyperparameter tuning.
+
+
+% Code block 
 \begin{verbatim}
   TransformerModel(
     (transformer_encoder): TransformerEncoderDiffInit(
@@ -171,10 +190,11 @@ TabPFN proposed a two-stage approach for tabular data classification:
 %--- Insert an image comparing 4 classifiers ---%
 \begin{figure}[!ht]
   \centering
-  \includegraphics[width=0.6\linewidth]{figures/TabPFN_architecture.png}
-  \caption{\label{fig:TabPFN_arch} TabPFN Architecture.}
+  \includegraphics[width=0.8\linewidth]{figures/classifier_decision_boundary.png}
+  \caption{\label{fig:classifier_decision_boundary} Decision boundaries on toy datasets generated with scikit-learn}
   \end{figure}
   
+% 
 \subsection{How to create sections and subsections}
 Simply use the section and subsection commands, as in this example document! With Overleaf, all the formatting and numbering is handled automatically according to the template you've chosen. If you're using the Visual Editor, you can also create new sections and subsections via the buttons in the editor toolbar.
 
