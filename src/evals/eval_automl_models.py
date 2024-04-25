@@ -105,7 +105,7 @@ scores_df.columns = [
 ]
 openml_list = openml_list.reset_index()
 result = pd.merge(openml_list, scores_df, on="Name")
-result.to_csv("data/openml_baseline_gbdt.csv", index=False)
+result.to_csv("data/openml_baseline_automl.csv", index=False)
 
 print(f"No of datasets: {len(scores)}")
 

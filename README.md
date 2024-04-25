@@ -28,8 +28,6 @@ pip install autogluon==0.4.0
 ```
 
 ## Getting Started
-See `src/tabpfn_demo.py` for scikit-learn interface.
-
 
 ```shell
 src
@@ -70,7 +68,17 @@ src
 ```
 #### Running the code 
 
-Please change BASE_DIR in `src/__init__.py`
+- Please change BASE_DIR in `src/__init__.py`
+
+See `src/tabpfn_demo.py` for scikit-learn interface and a basic classification task.
+
+
+``` python -m src.tabpfn_vs_xgb_demo
+# Accuracy (TabPFN) = 97.872%
+# Accuracy (XGBoost) = 96.809%
+```
+
+
 
 Download the retrained/modified model - `prior_diff_real_checkpointkc_n_0_epoch_100.cpkt` and save it to `src/models/modified/models_diff`
 
