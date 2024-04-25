@@ -14,14 +14,17 @@ from utils import get_openml_classification, preprocess_impute
 # ignore warnings
 def warn(*args, **kwargs):
     pass
+
 warnings.warn = warn
 
 openml_list = pd.read_csv("data/openml_list.csv")
 
-
 classifier_dict = {
-    "auto_sklearn": autosklearn.classification.AutoSklearnClassifier(time_left_for_this_task=120, per_run_time_limit=30),
-    "auto_gluon": TabularPredictor(label='target').set_learner_type('default'),
+    "auto_sklearn":
+    autosklearn.classification.AutoSklearnClassifier(
+        time_left_for_this_task=120, per_run_time_limit=30),
+    "auto_gluon":
+    TabularPredictor(label='target').set_learner_type('default'),
 }
 
 # Set random seed
@@ -35,12 +38,14 @@ for did in tqdm(openml_list.index):
     print(entry)
     try:
         X, y, categorical_feats, attribute_names = get_openml_classification(
-            int(entry.id), max_samples=2000, multiclass=True, shuffled=True
-        )
+            int(entry.id), max_samples=2000, multiclass=True, shuffled=True)
     except:
         continue
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=0.5, test_size=0.5)
+    X_train, X_test, y_train, y_test = train_test_split(X,
+                                                        y,
+                                                        train_size=0.5,
+                                                        test_size=0.5)
 
     # preprocess_impute
     X_train, y_train, X_test, y_test = preprocess_impute(
@@ -111,12 +116,18 @@ print(f"No of datasets: {len(scores)}")
 
 # Calculate mean scores for each classifier
 for key in classifier_dict:
-    roc = sum(s["roc"] for _, s in scores.items() if s["Classifier"] == key) / len(scores)
-    cross_entropy_list = [s["cross_entropy"] for _, s in scores.items() if s["Classifier"] == key]
+    roc = sum(s["roc"] for _, s in scores.items()
+              if s["Classifier"] == key) / len(scores)
+    cross_entropy_list = [
+        s["cross_entropy"] for _, s in scores.items() if s["Classifier"] == key
+    ]
     cross_entropy = sum(cross_entropy_list) / len(cross_entropy_list)
-    accuracy = sum(s["accuracy"] for _, s in scores.items() if s["Classifier"] == key) / len(scores)
-    pred_time = sum(s["pred_time"] for _, s in scores.items() if s["Classifier"] == key) / len(scores)
-    train_time = sum(s["train_time"] for _, s in scores.items() if s["Classifier"] == key) / len(scores)
+    accuracy = sum(s["accuracy"] for _, s in scores.items()
+                   if s["Classifier"] == key) / len(scores)
+    pred_time = sum(s["pred_time"] for _, s in scores.items()
+                    if s["Classifier"] == key) / len(scores)
+    train_time = sum(s["train_time"] for _, s in scores.items()
+                     if s["Classifier"] == key) / len(scores)
 
     print(
         f"Classifier: {key}, Mean ROC: {round(roc,3)}, Mean Cross Entropy: {round(cross_entropy,3)}, Mean Accuracy: {round(accuracy,3)}, Mean Prediction Time: {round(pred_time,3)}, Mean Train Time: {round(train_time,3)}s"

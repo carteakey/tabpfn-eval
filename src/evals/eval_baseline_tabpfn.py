@@ -1,40 +1,28 @@
 from sklearn.metrics import log_loss, roc_auc_score, accuracy_score
 from sklearn.model_selection import train_test_split
-from utils import get_openml_classification, preprocess_impute
+from ..utils import get_openml_classification, preprocess_impute
 from tabpfn import TabPFNClassifier
 from tqdm import tqdm
 import torch as th
 import time
 import pandas as pd
+import warnings
+import os
+from .. import BASE_DIR
+
 
 # ignore warnings
-import warnings
-
-from src import BASE_DIR
-import os
-
 def warn(*args, **kwargs):
     pass
 
 
 warnings.warn = warn
 
-openml_list = pd.read_csv('data/openml_list.csv')
+device = 'cuda' if th.cuda.is_available() else 'cpu'
 
-# filter with instances less than 4000 and features less than 100
-openml_list = openml_list[openml_list['# Instances'] <= 4000]
-openml_list = openml_list[openml_list['# Features'] <= 100]
-openml_list = openml_list[openml_list['# Classes'] <= 10]
-openml_list = openml_list[openml_list["# Instances"] >= 100]
+openml_list = pd.read_csv(os.path.join(BASE_DIR, 'data/openml_list.csv'))
 
-# Skip certain datasets because they are not working
-openml_list = openml_list[openml_list['id'] != 278]
-openml_list = openml_list[openml_list['id'] != 480]
-openml_list = openml_list[openml_list['id'] != 462]
-
-classifier = TabPFNClassifier(device='cuda',
-                              N_ensemble_configurations=32,
-                              seed=42)
+ensemble_configurations = [4, 8, 16, 32]
 
 scores = {}
 
@@ -63,27 +51,50 @@ for did in tqdm(openml_list.index):
             one_hot=True,
             standardize=False,
             cat_features=categorical_feats)
-        try:
-            start = time.time()
-            classifier.fit(X_train, y_train)
-            y_eval = classifier.predict(X_test)
-            y_prob = classifier.predict_proba(X_test)
-            pred_time = time.time() - start
-        except ValueError as ve:
-            print(ve)
-            print("ve", did)
-            continue
-        except TypeError as te:
-            print(te)
-            print("te", did)
+
+        avg_pred_time = 0
+        avg_train_time = 0
+        avg_roc = 0
+        avg_cross_entropy = 0
+        avg_accuracy = 0
+
+        values = []
+
+        for N_ensemble_configurations in ensemble_configurations:
+            try:
+                classifier = TabPFNClassifier(
+                    device=device,
+                    N_ensemble_configurations=N_ensemble_configurations,
+                    seed=42)
+
+                start = time.time()
+                classifier.fit(X_train, y_train)
+                y_eval = classifier.predict(X_test)
+                y_prob = classifier.predict_proba(X_test)
+                pred_time = time.time() - start
+
+                if y_prob.shape[1] == 2:
+                    y_prob = y_prob[:, 1]
+                roc_auc = roc_auc_score(y_test, y_prob, multi_class="ovr")
+                cross_entropy = log_loss(y_test, y_prob)
+                accuracy = accuracy_score(y_test, y_eval)
+
+                values.append((roc_auc, cross_entropy, accuracy, pred_time))
+
+            except ValueError as ve:
+                print(ve)
+                print("ve", did)
+                continue
+            except TypeError as te:
+                print(te)
+                print("te", did)
+                continue
+
+        if not values:
             continue
 
-        if y_prob.shape[1] == 2:
-            y_prob = y_prob[:, 1]
-
-        roc_auc = roc_auc_score(y_test, y_prob, multi_class="ovr")
-        cross_entropy = log_loss(y_test, y_prob)
-        accuracy = accuracy_score(y_test, y_eval)
+        roc_auc, cross_entropy, accuracy, pred_time = max(values,
+                                                          key=lambda x: x[0])
 
         scores[entry['Name']] = {
             "roc": roc_auc,
@@ -101,7 +112,8 @@ scores_df = scores_df.reset_index()
 scores_df.columns = ['Name', 'roc', 'pred_time', 'cross_entropy', 'accuracy']
 openml_list = openml_list.reset_index()
 result = pd.merge(openml_list, scores_df, on='Name')
-result.to_csv('data/openml_baseline_tabpfn.csv', index=False)
+result.to_csv(os.path.join(BASE_DIR, 'data/openml_baseline_tabpfn.csv'),
+              index=False)
 
 roc = sum(s["roc"] for _, s in scores.items()) / len(scores)
 # only calculate cross entropy for binary classification

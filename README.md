@@ -6,6 +6,7 @@ The [TabPFN](https://github.com/automl/TabPFN/) is a neural network that learned
 Need Python 3.9 or below
 ```bash
 conda create --name tabpfn python=3.9
+conda activate tabpfn
 ```
 
 Install all the libraries
@@ -20,6 +21,7 @@ create a separate environment and install
 
 ```bash
 conda create --name tabpfn-automl python=3.9
+conda activate tabpfn-automl
 ```
 
 ```bash
@@ -32,12 +34,13 @@ pip install autogluon==0.4.0
 ```shell
 src
 ├── __init__.py                         # initializing package
-├── datasets.py                         # selecting the datasets from OpenML
-├── eval_automl_models.py               # evaluating AutoML models
-├── eval_baseline_models.py             # evaluating baseline models
-├── eval_baseline_tabpfn.py             # evaluating baseline TabPFN model
-├── eval_gbdt_models.py                 # evaluating GBDT models
-├── eval_modified_tabpfn.py              # evaluating modified TabPFN model
+├── evals
+    ├── datasets.py                     # selecting the datasets from OpenML
+    ├── eval_automl_models.py           # evaluating AutoML models
+    ├── eval_baseline_models.py         # evaluating baseline models
+    ├── eval_baseline_tabpfn.py         # evaluating baseline TabPFN model
+    ├── eval_gbdt_models.py             # evaluating GBDT models
+    ├── eval_modified_tabpfn.py          # evaluating modified TabPFN model
 ├── data
 │   ├── openml_baseline_tabpfn.csv      # baseline results for TabPFN
 │   └── openml_modified_tabpfn.csv       # modified results for TabPFN
@@ -66,25 +69,33 @@ src
 ├── tabpfn_demo.py                      # TabPFN demo using scikit-learn interface
 └── utils.py                            # utility functions
 ```
-#### Running the code 
-
-- Please change BASE_DIR in `src/__init__.py`
+#### Running the demo code 
 
 See `src/tabpfn_demo.py` for scikit-learn interface and a basic classification task.
 
-
-``` python -m src.tabpfn_vs_xgb_demo
+```python
+python -m src.tabpfn_vs_xgb_demo
 # Accuracy (TabPFN) = 97.872%
 # Accuracy (XGBoost) = 96.809%
 ```
 
+###### Running the trained model
 
+Download the retrained/modified model - `prior_diff_real_checkpointkc_n_0_epoch_100.cpkt` and save it to `src/models/tabpfn/modified/models_diff`
+```
+cd ./src/models/tabpfn/modified/models_diff
+wget https://github.com/carteakey/tabpfn-eval/raw/main/src/models/tabpfn/modified/models_diff/prior_diff_real_checkpointkc_n_0_epoch_100.cpkt
+```
 
-Download the retrained/modified model - `prior_diff_real_checkpointkc_n_0_epoch_100.cpkt` and save it to `src/models/modified/models_diff`
+- Please change BASE_DIR in `src/__init__.py`
 
 ###### Generating datasets
 ```
-(tabpfn) kchauhan@kpc:~/repos/mds-tmu-dl$ python3 -m src.evals.datasets
+(tabpfn) kchauhan@kpc:~/repos/tabpfn-eval$ python3 -m src.evals.datasets
+```
+##### Running evals
+```
+python -m src.evals.eval_baseline_models_wo_hyperopt
 ```
 
 
@@ -107,3 +118,17 @@ Download the retrained/modified model - `prior_diff_real_checkpointkc_n_0_epoch_
 - Mean Prediction Time: 0.39s
 
 See `training_log.txt`
+
+
+### About TabPFN usage
+TabPFN is different from other methods you might know for tabular classification. Here, we list some tips and tricks that might help you understand how to use it best.
+
+* Do not preprocess inputs to TabPFN. TabPFN pre-processes inputs internally. It applies a z-score normalization (`x-train_x.mean()/train_x.std()`) per feature (fitted on the training set) and log-scales outliers heuristically. Finally, TabPFN applies a PowerTransform to all features for every second ensemble member. Pre-processing is important for the TabPFN to make sure that the real-world dataset lies in the distribution of the synthetic datasets seen during training. So to get the best results, do not apply a PowerTransformation to the inputs.
+
+* TabPFN expects scalar values only (you need to encode categoricals as integers e.g. with OrdinalEncoder). It works best on data that does not contain any categorical or NaN data.
+
+* TabPFN ensembles multiple input encodings per default. It feeds different index rotations of the features and labels to the model per ensemble member. You can control the ensembling with `TabPFNClassifier(...,N_ensemble_configurations=?)`
+
+* TabPFN does not use any statistics from the test set. That means predicting each test example one-by-one will yield the same result as feeding the whole test set together.
+
+* TabPFN is differentiable in principle, only the pre-processing is not and relies on numpy.

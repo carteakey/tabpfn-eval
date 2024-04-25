@@ -11,7 +11,7 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.svm import SVC
 from tqdm import tqdm
 
-from utils import get_openml_classification, preprocess_impute
+from ..utils import get_openml_classification, preprocess_impute
 
 # ignore warnings
 def warn(*args, **kwargs):
@@ -170,8 +170,8 @@ for did in tqdm(openml_list.index):
             f"Dataset: {entry['Name']}, Classifier: {key}, ROC: {roc_auc}, Cross-Entropy: {cross_entropy}, Accuracy: {accuracy}, Prediction Time: {pred_time}, Train Time: {train_time}"
         )
 
-        key = f"{entry['Name']}_{key}"
-        scores[key] = {
+        dict_key = f"{entry['Name']}_{key}"
+        scores[dict_key] = {
             "Classifier": key,
             "Dataset": entry["Name"],
             "roc": roc_auc,
@@ -181,39 +181,23 @@ for did in tqdm(openml_list.index):
             "train_time": train_time,
         }
 
-    #Save json 
-    pd.DataFrame(scores).to_json('data/openml_baseline_scores.json')
-    
+
+#Save json just in case
+pd.DataFrame(scores).to_json('data/openml_baseline_scores.json')
+
+scores_df = pd.read_json('data/openml_baseline_scores.json')
 # Join scores and openml_list on name
-scores_df = pd.DataFrame(scores, index=["score"]).T
+scores_df = scores_df.T
 scores_df = scores_df.reset_index()
+# scores_df['Classifier'] = scores_df['Classifier'].str.split('_').str[-1]
+scores_df.columns = ["index", "classifier", "Name", "roc", "cross_entropy", "accuracy", "pred_time", "train_time"]
 
-scores_df.to_csv('data/openml_baseline_scores.csv', index=False)
-
-scores_df.columns = [
-    "Name",
-    "Classifier",
-    "ROC",
-    "Cross-Entropy",
-    "Accuracy",
-    "Prediction Time",
-    "Train Time",
-]
 openml_list = openml_list.reset_index()
 result = pd.merge(openml_list, scores_df, on="Name")
 result.to_csv("data/openml_baseline_scores.csv", index=False)
 
-print(f"No of datasets: {len(scores)}")
-
 # Calculate mean scores for each classifier
-for key in classifier_dict:
-    roc = sum(s["roc"] for _, s in scores.items() if s["Classifier"] == key) / len(scores)
-    cross_entropy_list = [s["cross_entropy"] for _, s in scores.items() if s["Classifier"] == key]
-    cross_entropy = sum(cross_entropy_list) / len(cross_entropy_list)
-    accuracy = sum(s["accuracy"] for _, s in scores.items() if s["Classifier"] == key) / len(scores)
-    pred_time = sum(s["pred_time"] for _, s in scores.items() if s["Classifier"] == key) / len(scores)
-    train_time = sum(s["train_time"] for _, s in scores.items() if s["Classifier"] == key) / len(scores)
+print(scores_df.groupby("classifier")[["roc", "cross_entropy", "accuracy", "pred_time", "train_time"]].mean())
 
-    print(
-        f"Classifier: {key}, Mean ROC: {round(roc,3)}, Mean Cross Entropy: {round(cross_entropy,3)}, Mean Accuracy: {round(accuracy,3)}, Mean Prediction Time: {round(pred_time,3)}, Mean Train Time: {round(train_time,3)}s"
-    )
+# print to latex
+# print(scores_df.groupby("classifier")[["roc", "cross_entropy", "accuracy", "pred_time", "train_time"]].mean().to_latex())
