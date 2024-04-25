@@ -99,14 +99,3 @@ Download the retrained/modified model - `prior_diff_real_checkpointkc_n_0_epoch_
 - Mean Prediction Time: 0.39s
 
 See `training_log.txt`
-
-What is prior_bag (I guess it sequentially samples or something?)?
-It mixes different prior models, i.e. it randomly selects either one model or another. In the repo, the Gaussian process prior is mixed with the SCM and BNN prior. However, in the config the weight of the GP prior is set to 0 however so the prior_bag does not have a function in that case.
-
-
-Am I understanding correctly that the DifferentiableHyperparameter code is used only to sample dataset parameters from ranges set in the configs (and described in table 5 of the appendix)?
-
-Yes exactly. In the configs dict in key differentiable_hyperparameters, there are the keys of hyperparameters that are sampled alongside distributions from which they are sampled. The sampled hyperparameters overwrite the values in the config dictionary (i.e. outside the differentiable_hyperparameters key) after they are sampled.
-
-
-You are right the PriorFittingCustomPrior.ipynb notebook is used for training and the get_model function trains the model. The configs set in PriorFittingCustomPrior.ipynb reproduce our model. The configs are first retrieved from the function get_prior_config (scripts.model_configs) and then some settings are overwritten in the notebook.
