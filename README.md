@@ -10,9 +10,12 @@ We replicate the TabPFN model and evaluate it on more than 200 datasets from Ope
   - [Installation](#installation)
   - [Getting Started](#getting-started)
       - [Running the demo code](#running-the-demo-code)
-          - [Running the trained model](#running-the-trained-model)
-          - [Generating datasets](#generating-datasets)
-        - [Running evals](#running-evals)
+      - [Running the trained model](#running-the-trained-model)
+      - [Generating datasets](#generating-datasets)
+      - [Running evals](#running-evals)
+          - [Evaluate basline without hyperparameter tuning:](#evaluate-basline-without-hyperparameter-tuning)
+          - [Evaluate basline with hyperparameter tuning:](#evaluate-basline-with-hyperparameter-tuning)
+          - [Evaluate TabPFN:](#evaluate-tabpfn)
   - [Evaluation Results](#evaluation-results)
     - [TabPFN (original)](#tabpfn-original)
     - [TabPFN (retrained/modified) - trained for just 5 hours.](#tabpfn-retrainedmodified---trained-for-just-5-hours)
@@ -83,7 +86,7 @@ python -m src.tabpfn_vs_xgb_demo
 # Accuracy (XGBoost) = 96.809%
 ```
 
-###### Running the trained model
+#### Running the trained model
 
 Download the retrained/modified model - `prior_diff_real_checkpointkc_n_0_epoch_100.cpkt` and save it to `src/tabpfn/models_diff`
 ```
@@ -92,24 +95,28 @@ wget https://github.com/carteakey/tabpfn-eval/raw/main/src/tabpfn/models_diff/pr
 ```
 
 - Please change BASE_DIR in `src/__init__.py`!
+- The execution directory should be the root of the project.
 
-###### Generating datasets
+#### Generating datasets
 
+```shell
+python3 -m src.evals.datasets
 ```
-(tabpfn) kchauhan@kpc:~/repos/tabpfn-eval$ python3 -m src.evals.datasets
-```
 
-##### Running evals
+#### Running evals
 
-```
+###### Evaluate basline without hyperparameter tuning:
+```shell
 python -m src.evals.eval_baseline_models_wo_hyperopt
 ```
 
-```
+###### Evaluate basline with hyperparameter tuning:
+```shell
 python -m src.evals.eval_baseline_models
 ```
 
-```
+###### Evaluate TabPFN:
+```shell
 python -m src.evals.eval_tabpfn
 # set to True to use the modified version of TabPFN
 # use_mod = False

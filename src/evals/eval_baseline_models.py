@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 import xgboost as xgb
 from catboost import CatBoostClassifier
-from func_timeout import func_timeout
+import func_timeout
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, log_loss, roc_auc_score
@@ -22,7 +22,7 @@ from .. import BASE_DIR, OPENML_LIST
 from ..utils import get_openml_classification, preprocess_impute
 
 openml_list = OPENML_LIST
-timeout = 20
+timeout = 5
 
 classifier_dict = {
     "lr":
@@ -116,8 +116,6 @@ hyperparameters = {
 for key in classifier_dict:
     classifier_dict[key].random_state = 42
 
-# Add cross-validation
-
 scores = {}
 
 for did in tqdm(openml_list.index):
@@ -150,16 +148,10 @@ for did in tqdm(openml_list.index):
 
         try:
 
-            avg_pred_time = 0
-            avg_train_time = 0
-            avg_roc = 0
-            avg_cross_entropy = 0
-            avg_accuracy = 0
-
             values = []
 
             # 20 random hyperparameters
-            for _ in range(20):
+            for _ in range(10):
 
                 # Set hyperparameters randomly
                 for param in hyperparameters[key]:
@@ -174,15 +166,15 @@ for did in tqdm(openml_list.index):
                 # try if the classifier can be trained on the data
                 try:
 
-                    # Timeout after 20 seconds
                     def long_function():
                         return classifier_dict[key].fit(X_train, y_train)
 
+                    # Timeout after 5 seconds
                     try:
-                        result = func_timeout(timeout, long_function)
-                    except Exception as e:
-                        print(e)
-                        result = None
+                        result = func_timeout.func_timeout(
+                            timeout, long_function)
+                    except func_timeout.exceptions.FunctionTimedOut as e:
+                        continue
 
                     train_time = time.time() - start
                     y_pred = classifier_dict[key].predict(X_test)
