@@ -5,6 +5,7 @@
 # Modified for documentation by Jaques Grobler
 # License: BSD 3 clause
 
+import os
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.colors import ListedColormap
@@ -22,6 +23,8 @@ from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
 
 from tabpfn import TabPFNClassifier
+
+from .. import BASE_DIR
 
 h = .02  # step size in the mesh
 
@@ -154,4 +157,4 @@ plt.tight_layout()
 # plt.show()
 
 # save the figure
-figure.savefig("img/classifier_decision_boundary.png")
+figure.savefig(os.path.join(BASE_DIR, "plots/img/classifier_decision_boundary.png"))

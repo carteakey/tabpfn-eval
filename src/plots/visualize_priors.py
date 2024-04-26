@@ -24,7 +24,7 @@ def plot_prior_features(data, targets):
     fig = plt.figure(figsize=(8, 8))
     N = 100
     plot_features(data[0:N, 0, 0:4], targets[0:N, 0], fig=fig)
-    plt.savefig(os.path.join(BASE_DIR,'img/prior_features.png'))
+    plt.savefig(os.path.join(BASE_DIR, 'plots/img/prior_features.png'))
 
 
 def plot_prior_features_corr(data, targets):
@@ -32,7 +32,7 @@ def plot_prior_features_corr(data, targets):
     d[np.isnan(d)] = 0
     c = np.corrcoef(d)
     plt.matshow(np.abs(c), vmin=0, vmax=1)
-    plt.savefig(os.path.join(BASE_DIR,'img/prior_features_corr.png'))
+    plt.savefig(os.path.join(BASE_DIR, 'plots/img/prior_features_corr.png'))
 
 
 if __name__ == "__main__":

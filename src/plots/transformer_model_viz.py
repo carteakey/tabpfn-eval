@@ -30,7 +30,7 @@ output = model(input, single_eval_pos=single_eval_pos)
 # Visualize the model using torchviz
 dot = make_dot(output, params=dict(model.named_parameters()))
 dot.format = 'png'
-dot.render(os.path.join(BASE_DIR, 'img/transformer_model_viz'))
+dot.render(os.path.join(BASE_DIR, 'plots/img/transformer_model_viz'))
 
 # Visualize the model using torchview
 model_graph = draw_graph(model,
