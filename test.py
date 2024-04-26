@@ -8,33 +8,6 @@ df_baseline_tabpfn = pd.read_csv('openml_baseline_tabpfn.csv')
 df_modified_tabpfn = pd.read_csv('openml_modified_tabpfn.csv')
 
 
-
-
-# drop index_x and index_y
-df_baseline = df_baseline.drop(columns=['index_x', 'index_y'])
-
-df_baseline.head()
-
-# add classifier name to the dataframes
-df_baseline_tabpfn['classifier'] = 'baseline_tabpfn'
-df_modified_tabpfn['classifier'] = 'modified_tabpfn'
-
-df_baseline_tabpfn.head()
-
-# Move classifier column to the 9th column
-cols = df_baseline_tabpfn.columns.tolist()
-cols = cols[:9] + cols[-1:] + cols[9:-1]
-df_baseline_tabpfn = df_baseline_tabpfn[cols]
-
-# Move classifier column to the 9th column
-cols = df_modified_tabpfn.columns.tolist()
-cols = cols[:9] + cols[-1:] + cols[9:-1]
-df_modified_tabpfn = df_modified_tabpfn[cols]
-
-# Join all dataframes
-df = pd.concat([df_baseline, df_baseline_tabpfn, df_modified_tabpfn])
-df.head()
-
 # sort by id
 df = df.sort_values(by=['id'])
 

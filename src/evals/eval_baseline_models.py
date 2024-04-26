@@ -22,6 +22,9 @@ from .. import BASE_DIR, OPENML_LIST
 from ..utils import get_openml_classification, preprocess_impute
 
 openml_list = OPENML_LIST
+# Filter for less than 1000 samples
+openml_list = openml_list[openml_list["# Instances"] < 1000]
+
 timeout = 5
 
 classifier_dict = {
@@ -226,11 +229,15 @@ for did in tqdm(openml_list.index):
             "pred_time": pred_time,
             "train_time": train_time,
         }
+        #Save json just in case
+        pd.DataFrame(scores).to_json(os.path.join(BASE_DIR, 'data/openml_baseline_scores.json'))
 
-#Save json just in case
-pd.DataFrame(scores).to_json('data/openml_baseline_scores.json')
+# #Save json just in case
+# pd.DataFrame(scores).to_json(
+#     os.path.join(BASE_DIR, 'data/openml_baseline_scores.json'))
 
-scores_df = pd.read_json('data/openml_baseline_scores.json')
+scores_df = pd.read_json(
+    os.path.join(BASE_DIR, 'data/openml_baseline_scores.json'))
 # Join scores and openml_list on name
 scores_df = scores_df.T
 scores_df = scores_df.reset_index()
@@ -242,7 +249,8 @@ scores_df.columns = [
 
 openml_list = openml_list.reset_index()
 result = pd.merge(openml_list, scores_df, on="Name")
-result.to_csv("data/openml_baseline_scores.csv", index=False)
+result.to_csv(os.path.join(BASE_DIR, "data/openml_baseline_scores.csv"),
+              index=False)
 
 # Calculate mean scores for each classifier
 print(
