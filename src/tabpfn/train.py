@@ -1,15 +1,19 @@
 import time
+import os
 from tabpfn.scripts.model_builder import get_model, save_model
+from src.tabpfn.train_config import config_sample
+from src import BASE_DIR
 
 device = "cuda"
-base_path = "."
+base_path = os.path.join(BASE_DIR, "tabpfn/")
+
 max_features = 100
 maximum_runtime = 60 * 1  # in minutes
 
-# Uncomment the following lines to load a previously trained model
-# model_state, optimizer_state, config_sample = torch.load(
-#     os.path.join("models_diff",
-#                  "prior_diff_real_checkpointkc_n_0_epoch_16.cpkt"))
+Uncomment the following lines to load a previously trained model
+model_state, optimizer_state, config_sample = torch.load(
+    os.path.join(BASE_DIR, "tabpfn/models_diff",
+                 "prior_diff_real_checkpointkc_n_0_epoch_16.cpkt"))
 
 
 def train_function(config_sample, i, add_name=""):
@@ -41,8 +45,5 @@ def train_function(config_sample, i, add_name=""):
     )
 
     return
-
-
-from train_config import config_sample
 
 train_function(config_sample, 0, add_name="kc")

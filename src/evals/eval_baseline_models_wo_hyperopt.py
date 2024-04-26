@@ -1,7 +1,12 @@
+import os
 import time
 import warnings
+
+import lightgbm as lgb
 import numpy as np
 import pandas as pd
+import xgboost as xgb
+from catboost import CatBoostClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, log_loss, roc_auc_score
@@ -10,23 +15,13 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.svm import SVC
 from tqdm import tqdm
+
 from tabpfn import TabPFNClassifier
-import os
+
+from .. import BASE_DIR, OPENML_LIST
 from ..utils import get_openml_classification, preprocess_impute
-from .. import BASE_DIR
-import xgboost as xgb
-import lightgbm as lgb
-from catboost import CatBoostClassifier
 
-
-# ignore warnings
-def warn(*args, **kwargs):
-    pass
-
-
-warnings.warn = warn
-
-openml_list = pd.read_csv(os.path.join(BASE_DIR, 'data/openml_list.csv'))
+openml_list = OPENML_LIST
 
 classifier_dict = {
     "lr":

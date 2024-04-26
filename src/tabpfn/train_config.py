@@ -2,10 +2,9 @@ import json
 import os
 from datetime import datetime
 
-from model_configs import *
-
 from src import BASE_DIR
-from src.utils import make_serializable, reload_config
+from src.tabpfn.model_configs import *
+from src.utils import make_serializable
 
 
 def reload_config(config_type="causal", task_type="multiclass", longer=0):
@@ -36,7 +35,7 @@ def reload_config(config_type="causal", task_type="multiclass", longer=0):
 config, model_string = reload_config(longer=1)
 
 config["bptt_extra_samples"] = None
-del config["differentiable_hyperparameters"]["output_multiclass_ordered_p"]
+# del config["differentiable_hyperparameters"]["output_multiclass_ordered_p"]
 config["sampling"] = "mixed"
 config["dynamic_batch_size"] = False
 config["multiclass_loss_type"] = "nono"

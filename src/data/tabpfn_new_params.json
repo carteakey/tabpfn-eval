@@ -1,7 +1,7 @@
 {
     "aggregate_k_gradients": 8,
     "balanced": false,
-    "batch_size": 64,
+    "batch_size": 1024,
     "batch_size_per_gp_sample": null,
     "bptt": 2048,
     "bptt_extra_samples": null,
@@ -81,6 +81,11 @@
             "min_mean": 1,
             "round": true
         },
+        "output_multiclass_ordered_p": {
+            "distribution": "uniform",
+            "max": 0.5,
+            "min": 0.0
+        },
         "outputscale": {
             "distribution": "meta_trunc_norm_log_scaled",
             "lower_bound": 0,
@@ -157,7 +162,7 @@
     "epochs": 400,
     "eval_positions": null,
     "flexible": true,
-    "lr": 0.00012727366656530774,
+    "lr": 0.00013944036298157948,
     "max_eval_pos": 1000,
     "max_num_classes": 10,
     "mix_activations": true,
@@ -177,13 +182,12 @@
     "normalize_to_ranking": false,
     "normalize_with_sqrt": false,
     "num_categorical_features_sampler_a": -1.0,
-    "num_classes": "<function <lambda>.<locals>.<lambda> at 0x7f905df828b0>",
+    "num_classes": "<function <lambda>.<locals>.<lambda> at 0x7fd9d8a51040>",
     "num_features": 100,
     "num_features_used": {
-        "uniform_int_sampler_f(3,max_features)": "<function <lambda>.<locals>.<lambda> at 0x7f905df82820>"
+        "uniform_int_sampler_f(3,max_features)": "<function <lambda>.<locals>.<lambda> at 0x7fd9d8a47b80>"
     },
     "num_steps": 128,
-    "output_multiclass_ordered_p": 0.0,
     "prior_mlp_scale_weights_sqrt": true,
     "prior_type": "prior_bag",
     "random_feature_rotation": true,

@@ -17,6 +17,3 @@ tqdm
 lightgbm
 func_timeout
 
-# Install in separate environment
-# auto-sklearn==0.14.5
-# autogluon==0.4.0

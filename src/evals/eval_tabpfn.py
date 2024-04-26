@@ -13,8 +13,9 @@ openml_list = OPENML_LIST
 device = th.device("cuda" if th.cuda.is_available() else "cpu")
 
 # set to True to use the modified version of TabPFN
-use_mod = False
+use_mod = True
 
+# Hyperparameters
 ensemble_configurations = [4, 8, 16, 32]
 
 scores = {}
@@ -45,23 +46,17 @@ for did in tqdm(openml_list.index):
             standardize=False,
             cat_features=categorical_feats)
 
-        avg_pred_time = 0
-        avg_train_time = 0
-        avg_roc = 0
-        avg_cross_entropy = 0
-        avg_accuracy = 0
-
         values = []
 
         for N_ensemble_configurations in ensemble_configurations:
             try:
                 if use_mod:
-                    classifier = TabPFNClassifier(device=device,
-                                                  base_path=os.path.join(
-                                                      BASE_DIR, "tabpfn/"),
-                                                  model_string='kc',
-                                                  N_ensemble_configurations=32,
-                                                  seed=42)
+                    classifier = TabPFNClassifier(
+                        device=device,
+                        base_path=os.path.join(BASE_DIR, "tabpfn/"),
+                        model_string='kc',
+                        N_ensemble_configurations=N_ensemble_configurations,
+                        seed=42)
                 else:
                     classifier = TabPFNClassifier(
                         device=device,
