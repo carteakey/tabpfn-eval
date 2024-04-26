@@ -81,10 +81,10 @@ python -m src.tabpfn_vs_xgb_demo
 
 ###### Running the trained model
 
-Download the retrained/modified model - `prior_diff_real_checkpointkc_n_0_epoch_100.cpkt` and save it to `src/models/tabpfn/modified/models_diff`
+Download the retrained/modified model - `prior_diff_real_checkpointkc_n_0_epoch_100.cpkt` and save it to `src/tabpfn/models_diff`
 ```
-cd ./src/models/tabpfn/modified/models_diff
-wget https://github.com/carteakey/tabpfn-eval/raw/main/src/models/tabpfn/modified/models_diff/prior_diff_real_checkpointkc_n_0_epoch_100.cpkt
+cd ./src/tabpfn/models_diff
+wget https://github.com/carteakey/tabpfn-eval/raw/main/src/tabpfn/models_diff/prior_diff_real_checkpointkc_n_0_epoch_100.cpkt
 ```
 
 - Please change BASE_DIR in `src/__init__.py`
@@ -105,17 +105,17 @@ python -m src.evals.eval_baseline_models_wo_hyperopt
 
 ### TabPFN (original)
 - No of datasets: 247
-- Mean ROC: 0.843
+- Mean ROC: 0.846
 - Mean Cross Entropy: nan
-- Mean Accuracy: 0.802
-- Mean Prediction Time: 0.357s
+- Mean Accuracy: 0.803
+- Mean Prediction Time: 0.233s
  
 ### TabPFN (retrained/modified) - trained for just 5 hours.
 - No of datasets: 247
 - Mean ROC: 0.837
 - Mean Cross Entropy: 0.451
 - Mean Accuracy: 0.792
-- Mean Prediction Time: 0.39s
+- Mean Prediction Time: 0.388s
 
 See `training_log.txt`
 

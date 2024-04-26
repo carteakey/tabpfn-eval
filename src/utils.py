@@ -7,13 +7,26 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.impute import SimpleImputer
 from sklearn.compose import ColumnTransformer
 
+def make_serializable(config_sample):
+    if isinstance(config_sample, dict):
+        config_sample = {
+            k: make_serializable(config_sample[k])
+            for k in config_sample
+        }
+    if isinstance(config_sample, list):
+        config_sample = [make_serializable(v) for v in config_sample]
+    if callable(config_sample):
+        config_sample = str(config_sample)
+    return config_sample
 
 
-def get_openml_classification(did, max_samples, multiclass=True, shuffled=True):
+def get_openml_classification(did,
+                              max_samples,
+                              multiclass=True,
+                              shuffled=True):
     dataset = openml.datasets.get_dataset(did)
     X, y, categorical_indicator, attribute_names = dataset.get_data(
-        dataset_format="array", target=dataset.default_target_attribute
-    )
+        dataset_format="array", target=dataset.default_target_attribute)
 
     if not multiclass:
         X = X[y < 2]
@@ -26,16 +39,12 @@ def get_openml_classification(did, max_samples, multiclass=True, shuffled=True):
     if not shuffled:
         sort = np.argsort(y) if y.mean() < 0.5 else np.argsort(-y)
         pos = int(y.sum()) if y.mean() < 0.5 else int((1 - y).sum())
-        X, y = X[sort][-pos * 2 :], y[sort][-pos * 2 :]
-        y = torch.tensor(y).reshape(2, -1).transpose(0, 1).reshape(-1).flip([0]).float()
-        X = (
-            torch.tensor(X)
-            .reshape(2, -1, X.shape[1])
-            .transpose(0, 1)
-            .reshape(-1, X.shape[1])
-            .flip([0])
-            .float()
-        )
+        X, y = X[sort][-pos * 2:], y[sort][-pos * 2:]
+        y = torch.tensor(y).reshape(2, -1).transpose(0, 1).reshape(-1).flip(
+            [0]).float()
+        X = (torch.tensor(X).reshape(2, -1,
+                                     X.shape[1]).transpose(0, 1).reshape(
+                                         -1, X.shape[1]).flip([0]).float())
     else:
         order = np.arange(y.shape[0])
         np.random.seed(13)
@@ -47,9 +56,14 @@ def get_openml_classification(did, max_samples, multiclass=True, shuffled=True):
     return X, y, list(np.where(categorical_indicator)[0]), attribute_names
 
 
-def preprocess_impute(
-    x, y, test_x, test_y, impute, one_hot, standardize, cat_features=[]
-):
+def preprocess_impute(x,
+                      y,
+                      test_x,
+                      test_y,
+                      impute,
+                      one_hot,
+                      standardize,
+                      cat_features=[]):
 
     x, y, test_x, test_y = (
         x.cpu().numpy(),
@@ -73,13 +87,11 @@ def preprocess_impute(
 
         x, test_x = make_pd_from_np(x), make_pd_from_np(test_x)
         transformer = ColumnTransformer(
-            transformers=[
-                (
-                    "cat",
-                    OneHotEncoder(handle_unknown="ignore", sparse=False),
-                    cat_features,
-                )
-            ],
+            transformers=[(
+                "cat",
+                OneHotEncoder(handle_unknown="ignore", sparse=False),
+                cat_features,
+            )],
             remainder="passthrough",
         )
         transformer.fit(x)

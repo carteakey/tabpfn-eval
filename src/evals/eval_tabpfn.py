@@ -6,21 +6,14 @@ from tqdm import tqdm
 import torch as th
 import time
 import pandas as pd
-import warnings
 import os
-from .. import BASE_DIR
+from .. import BASE_DIR, OPENML_LIST
 
+openml_list = OPENML_LIST
+device = th.device("cuda" if th.cuda.is_available() else "cpu")
 
-# ignore warnings
-def warn(*args, **kwargs):
-    pass
-
-
-warnings.warn = warn
-
-device = 'cuda' if th.cuda.is_available() else 'cpu'
-
-openml_list = pd.read_csv(os.path.join(BASE_DIR, 'data/openml_list.csv'))
+# set to True to use the modified version of TabPFN
+use_mod = False
 
 ensemble_configurations = [4, 8, 16, 32]
 
@@ -31,7 +24,7 @@ for did in tqdm(openml_list.index):
     print(entry)
     try:
         X, y, categorical_feats, attribute_names = get_openml_classification(
-            int(entry.id), max_samples=2000, multiclass=True, shuffled=True)
+            int(entry.id), max_samples=4000, multiclass=True, shuffled=True)
     except:
         continue
 
@@ -62,13 +55,21 @@ for did in tqdm(openml_list.index):
 
         for N_ensemble_configurations in ensemble_configurations:
             try:
-                classifier = TabPFNClassifier(
-                    device=device,
-                    N_ensemble_configurations=N_ensemble_configurations,
-                    seed=42)
+                if use_mod:
+                    classifier = TabPFNClassifier(device=device,
+                                                  base_path=os.path.join(
+                                                      BASE_DIR, "tabpfn/"),
+                                                  model_string='kc',
+                                                  N_ensemble_configurations=32,
+                                                  seed=42)
+                else:
+                    classifier = TabPFNClassifier(
+                        device=device,
+                        N_ensemble_configurations=N_ensemble_configurations,
+                        seed=42)
 
                 start = time.time()
-                classifier.fit(X_train, y_train)
+                classifier.fit(X_train, y_train, overwrite_warning=True)
                 y_eval = classifier.predict(X_test)
                 y_prob = classifier.predict_proba(X_test)
                 pred_time = time.time() - start
@@ -112,8 +113,13 @@ scores_df = scores_df.reset_index()
 scores_df.columns = ['Name', 'roc', 'pred_time', 'cross_entropy', 'accuracy']
 openml_list = openml_list.reset_index()
 result = pd.merge(openml_list, scores_df, on='Name')
-result.to_csv(os.path.join(BASE_DIR, 'data/openml_baseline_tabpfn.csv'),
-              index=False)
+
+if use_mod:
+    result.to_csv(os.path.join(BASE_DIR, 'data/openml_modified_tabpfn.csv'),
+                  index=False)
+else:
+    result.to_csv(os.path.join(BASE_DIR, 'data/openml_baseline_tabpfn.csv'),
+                  index=False)
 
 roc = sum(s["roc"] for _, s in scores.items()) / len(scores)
 # only calculate cross entropy for binary classification

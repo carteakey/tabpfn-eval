@@ -1,16 +1,13 @@
 import os
-import numpy as np
-from tabpfn.scripts.model_builder import get_model
-from tabpfn.priors.utils import  plot_features
+
 import matplotlib.pyplot as plt
+import numpy as np
 
-import sys
+from src.tabpfn.train_config import config_sample
+from tabpfn.priors.utils import plot_features
+from tabpfn.scripts.model_builder import get_model
 
-base_dir = '/home/kchauhan/repos/mds-tmu-dl'
-sys.path.append(os.path.join(base_dir))
-sys.path.append(os.path.join(base_dir, 'src/models/tabpfn/modified/'))
-from src.models.tabpfn.modified.train_config import config_sample
-
+from .. import BASE_DIR
 
 
 def main():
@@ -27,7 +24,7 @@ def plot_prior_features(data, targets):
     fig = plt.figure(figsize=(8, 8))
     N = 100
     plot_features(data[0:N, 0, 0:4], targets[0:N, 0], fig=fig)
-    plt.savefig('img/prior_features.png')
+    plt.savefig(os.path.join(BASE_DIR,'img/prior_features.png'))
 
 
 def plot_prior_features_corr(data, targets):
@@ -35,7 +32,7 @@ def plot_prior_features_corr(data, targets):
     d[np.isnan(d)] = 0
     c = np.corrcoef(d)
     plt.matshow(np.abs(c), vmin=0, vmax=1)
-    plt.savefig('img/prior_features_corr.png')
+    plt.savefig(os.path.join(BASE_DIR,'img/prior_features_corr.png'))
 
 
 if __name__ == "__main__":

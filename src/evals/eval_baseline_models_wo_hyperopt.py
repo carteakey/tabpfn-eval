@@ -18,25 +18,39 @@ import xgboost as xgb
 import lightgbm as lgb
 from catboost import CatBoostClassifier
 
+
 # ignore warnings
 def warn(*args, **kwargs):
     pass
+
 
 warnings.warn = warn
 
 openml_list = pd.read_csv(os.path.join(BASE_DIR, 'data/openml_list.csv'))
 
 classifier_dict = {
-    "lr": LogisticRegression(),
-    "rf": RandomForestClassifier(),
-    "svm": SVC(probability=True),
-    "mlp": MLPClassifier(),
-    "knn": KNeighborsClassifier(),
-    "xgb": xgb.XGBClassifier(),
-    "lgb": lgb.LGBMClassifier(),
-    "cat": CatBoostClassifier(verbose=0),
-    "tabpfn_mod": TabPFNClassifier(seed=42, model_string="kc", base_path=os.path.join(BASE_DIR, "models/tabpfn/modified/")),
-    "tabpfn": TabPFNClassifier(seed=42)
+    "lr":
+    LogisticRegression(),
+    "rf":
+    RandomForestClassifier(),
+    "svm":
+    SVC(probability=True),
+    "mlp":
+    MLPClassifier(),
+    "knn":
+    KNeighborsClassifier(),
+    "xgb":
+    xgb.XGBClassifier(),
+    "lgb":
+    lgb.LGBMClassifier(),
+    "cat":
+    CatBoostClassifier(verbose=0),
+    "tabpfn_mod":
+    TabPFNClassifier(seed=42,
+                     model_string="kc",
+                     base_path=os.path.join(BASE_DIR, "tabpfn/")),
+    "tabpfn":
+    TabPFNClassifier(seed=42)
 }
 
 # Set random seed
@@ -51,7 +65,7 @@ for did in tqdm(openml_list.index):
     print(entry)
     try:
         X, y, categorical_feats, attribute_names = get_openml_classification(
-            int(entry.id), max_samples=2000, multiclass=True, shuffled=True)
+            int(entry.id), max_samples=4000, multiclass=True, shuffled=True)
     except:
         continue
 
@@ -155,4 +169,7 @@ print(
 # print to latex
 # Combine pred_time and train_time
 scores_df["pred_time"] = scores_df["pred_time"] + scores_df["train_time"]
-print(scores_df.groupby("classifier")[["roc", "cross_entropy", "accuracy", "pred_time"]].mean().round(3).T.to_latex(escape=True))
+print(
+    scores_df.groupby("classifier")[[
+        "roc", "cross_entropy", "accuracy", "pred_time"
+    ]].mean().round(3).T.to_latex(escape=True))

@@ -2,7 +2,8 @@ from tqdm import tqdm
 import openml
 import pandas as pd
 import os
-from .. import BASE_DIR 
+from .. import BASE_DIR
+
 
 # Find datasets with a certain number of features
 def extend_datasets(datasets, filtering=False):
@@ -135,7 +136,19 @@ print_table = print_table.reset_index(drop=True)
 print_table.to_csv(os.path.join(BASE_DIR, "data/openml_list.csv"), index=False)
 
 # print to latex
-print_table.columns = ['Name', 'Feat.', 'Cat.', 'Inst.', 'Class.', 'NaNs', 'Minor. Class Size', 'OpenML ID']
-# Truncate long names to ...
-print_table = print_table.apply(lambda x: x.str[:30] + "..." if x.dtype == "object" else x)
-print(print_table.to_latex(index=False,escape=True, column_format="lrrrrrrr", longtable=True, label='datasets', caption='List of datasets used in the experiments.', position='H'))
+print_table.columns = [
+    'Name', 'Feat.', 'Cat.', 'Inst.', 'Class.', 'NaNs', 'Minor. Class Size',
+    'OpenML ID'
+]
+
+# # Truncate long names to ...
+# print_table = print_table.apply(lambda x: x.str[:30] + "..."
+#                                 if x.dtype == "object" else x)
+# print(
+#     print_table.to_latex(index=False,
+#                          escape=True,
+#                          column_format="lrrrrrrr",
+#                          longtable=True,
+#                          label='datasets',
+#                          caption='List of datasets used in the experiments.',
+#                          position='H'))

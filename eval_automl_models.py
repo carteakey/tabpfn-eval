@@ -5,26 +5,21 @@ import pandas as pd
 from sklearn.metrics import accuracy_score, log_loss, roc_auc_score
 from sklearn.model_selection import train_test_split
 from tqdm import tqdm
-
+import os
 import autosklearn.classification
 from autogluon.tabular import TabularPredictor
 
-from utils import get_openml_classification, preprocess_impute
+from ..utils import get_openml_classification, preprocess_impute
+from .. import OPENML_LIST
 
-# ignore warnings
-def warn(*args, **kwargs):
-    pass
-
-warnings.warn = warn
-
-openml_list = pd.read_csv("data/openml_list.csv")
+openml_list = OPENML_LIST
 
 classifier_dict = {
     "auto_sklearn":
     autosklearn.classification.AutoSklearnClassifier(
-        time_left_for_this_task=120, per_run_time_limit=30),
+        time_left_for_this_task=120, per_run_time_limit=30, memory_limit=4096),
     "auto_gluon":
-    TabularPredictor(label='target').set_learner_type('default'),
+    TabularPredictor(label='target'),
 }
 
 # Set random seed
@@ -38,7 +33,7 @@ for did in tqdm(openml_list.index):
     print(entry)
     try:
         X, y, categorical_feats, attribute_names = get_openml_classification(
-            int(entry.id), max_samples=2000, multiclass=True, shuffled=True)
+            int(entry.id), max_samples=4000, multiclass=True, shuffled=True)
     except:
         continue
 

@@ -1,27 +1,23 @@
+import os
 import time
 import warnings
+
+import lightgbm as lgb
 import numpy as np
 import pandas as pd
+import xgboost as xgb
+from catboost import CatBoostClassifier
 from sklearn.metrics import accuracy_score, log_loss, roc_auc_score
 from sklearn.model_selection import train_test_split
 from tqdm import tqdm
 
-import xgboost as xgb
-import lightgbm as lgb
-from catboost import CatBoostClassifier
-
-from utils import get_openml_classification, preprocess_impute
-from src import BASE_DIR
-import os
-
+from .. import BASE_DIR
+from ..utils import get_openml_classification, preprocess_impute
 
 # ignore warnings
-def warn(*args, **kwargs):
-    pass
-warnings.warn = warn
+warnings.warn = lambda *args, **kwargs: None
 
 openml_list = pd.read_csv(os.path.join(BASE_DIR, "data/openml_list.csv"))
-
 
 classifier_dict = {
     "xgb": xgb.XGBClassifier(),
@@ -58,8 +54,6 @@ hyperparameters = {
 for key in classifier_dict:
     classifier_dict[key].random_state = 42
 
-# Add cross-validation
-
 scores = {}
 
 for did in tqdm(openml_list.index):
@@ -67,12 +61,14 @@ for did in tqdm(openml_list.index):
     print(entry)
     try:
         X, y, categorical_feats, attribute_names = get_openml_classification(
-            int(entry.id), max_samples=2000, multiclass=True, shuffled=True
-        )
+            int(entry.id), max_samples=4000, multiclass=True, shuffled=True)
     except:
         continue
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=0.5, test_size=0.5)
+    X_train, X_test, y_train, y_test = train_test_split(X,
+                                                        y,
+                                                        train_size=0.5,
+                                                        test_size=0.5)
 
     # preprocess_impute
     X_train, y_train, X_test, y_test = preprocess_impute(
@@ -89,7 +85,6 @@ for did in tqdm(openml_list.index):
     for key in classifier_dict:
 
         try:
-
             avg_pred_time = 0
             avg_train_time = 0
             avg_roc = 0
@@ -133,9 +128,11 @@ for did in tqdm(openml_list.index):
                     print(e)
                     continue
 
-                values.append((roc_auc, cross_entropy, accuracy, pred_time, train_time))
+                values.append(
+                    (roc_auc, cross_entropy, accuracy, pred_time, train_time))
 
-            roc_auc, cross_entropy, accuracy, pred_time, train_time = max(values, key=lambda x: x[0])
+            roc_auc, cross_entropy, accuracy, pred_time, train_time = max(
+                values, key=lambda x: x[0])
 
         except ValueError as ve:
             print(ve)
@@ -154,7 +151,10 @@ for did in tqdm(openml_list.index):
             f"Dataset: {entry['Name']}, Classifier: {key}, ROC: {roc_auc}, Cross-Entropy: {cross_entropy}, Accuracy: {accuracy}, Prediction Time: {pred_time}, Train Time: {train_time}"
         )
 
-        scores[(entry["Name"], key)] = {
+        dict_key = f"{entry['Name']}_{key}"
+        scores[dict_key] = {
+            "Classifier": key,
+            "Dataset": entry["Name"],
             "roc": roc_auc,
             "cross_entropy": cross_entropy,
             "accuracy": accuracy,
@@ -162,36 +162,28 @@ for did in tqdm(openml_list.index):
             "train_time": train_time,
         }
 
+#Save json just in case
+pd.DataFrame(scores).to_json('data/openml_gbdt_scores.json')
+
+scores_df = pd.read_json('data/openml_gbdt_scores.json')
 # Join scores and openml_list on name
-scores_df = pd.DataFrame(scores, index=["score"]).T
+scores_df = scores_df.T
 scores_df = scores_df.reset_index()
-
-scores_df.to_csv('data/openml_baseline_scores.csv', index=False)
-
+# scores_df['Classifier'] = scores_df['Classifier'].str.split('_').str[-1]
 scores_df.columns = [
-    "Name",
-    "Classifier",
-    "ROC",
-    "Cross-Entropy",
-    "Accuracy",
-    "Prediction Time",
-    "Train Time",
+    "index", "classifier", "Name", "roc", "cross_entropy", "accuracy",
+    "pred_time", "train_time"
 ]
+
 openml_list = openml_list.reset_index()
 result = pd.merge(openml_list, scores_df, on="Name")
-result.to_csv("data/openml_baseline_gbdt.csv", index=False)
-
-print(f"No of datasets: {len(scores)}")
+result.to_csv("data/openml_gbdt_scores.csv", index=False)
 
 # Calculate mean scores for each classifier
-for key in classifier_dict:
-    roc = sum(s["roc"] for _, s in scores.items() if s["Classifier"] == key) / len(scores)
-    cross_entropy_list = [s["cross_entropy"] for _, s in scores.items() if s["Classifier"] == key]
-    cross_entropy = sum(cross_entropy_list) / len(cross_entropy_list)
-    accuracy = sum(s["accuracy"] for _, s in scores.items() if s["Classifier"] == key) / len(scores)
-    pred_time = sum(s["pred_time"] for _, s in scores.items() if s["Classifier"] == key) / len(scores)
-    train_time = sum(s["train_time"] for _, s in scores.items() if s["Classifier"] == key) / len(scores)
+print(
+    scores_df.groupby("classifier")[[
+        "roc", "cross_entropy", "accuracy", "pred_time", "train_time"
+    ]].mean())
 
-    print(
-        f"Classifier: {key}, Mean ROC: {round(roc,3)}, Mean Cross Entropy: {round(cross_entropy,3)}, Mean Accuracy: {round(accuracy,3)}, Mean Prediction Time: {round(pred_time,3)}, Mean Train Time: {round(train_time,3)}s"
-    )
+# print to latex
+# print(scores_df.groupby("classifier")[["roc", "cross_entropy", "accuracy", "pred_time", "train_time"]].mean().to_latex())

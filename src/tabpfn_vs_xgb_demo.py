@@ -4,6 +4,7 @@ from sklearn.model_selection import train_test_split
 import xgboost as xgb
 from tabpfn import TabPFNClassifier
 
+
 def tabpfn_classifier(X_train, y_train, X_test):
     # N_ensemble_configurations controls the number of model predictions that are ensembled with feature and class rotations (See our work for details).
     # # When N_ensemble_configurations > #features * #classes, no further averaging is applied.
